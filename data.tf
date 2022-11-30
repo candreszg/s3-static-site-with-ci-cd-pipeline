@@ -21,3 +21,12 @@ data "aws_iam_policy_document" "bucket_policy_document" {
   }
 }
 
+data "archive_file" "function_code" {
+
+  type        = "zip"
+  source_dir  = "${path.module}/function_code/"
+  output_path = "${path.module}/function_code/${var.lambda_function_name}.zip"
+}
+
+
+

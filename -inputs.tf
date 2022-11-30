@@ -80,3 +80,7 @@ variable "repository_id" {
   description = "name of bucket to create"
   type        = string
 }
+
+variable "lambda_function_name" {
+  default = "lambda_function_name"
+}

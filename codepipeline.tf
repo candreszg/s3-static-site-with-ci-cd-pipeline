@@ -43,6 +43,23 @@ resource "aws_codepipeline" "website_pipeline" {
       }
     }
   }
+
+  stage {
+    name = "Invalidate"
+
+    action {
+      name            = "Invalidate"
+      category        = "Invoke"
+      owner           = "AWS"
+      provider        = "Lambda"
+      version         = "1"
+
+      configuration = {
+        FunctionName    = aws_lambda_function.invalidation_lambda.function_name
+        UserParameters  = "{\"distributionId\": \"${aws_cloudfront_distribution.s3_distribution.id}\", \"objectPaths\": [\"/*\"]}"
+      }
+    }
+  }
 }
 
 resource "aws_codestarconnections_connection" "github_connection" {
@@ -103,6 +120,15 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
       ]
     },
     {
+      "Effect":"Allow",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+        "${aws_lambda_function.invalidation_lambda.arn}"
+      ]
+    },
+    {
       "Effect": "Allow",
       "Action": [
         "codestar-connections:UseConnection"
@@ -121,5 +147,3 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
 }
 EOF
 }
-
-
